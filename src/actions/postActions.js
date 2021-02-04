@@ -19,7 +19,7 @@ export const getPosts = () => ({
   type: GET_POSTS,
 });
 
-export const getPostsSuccess = () => ({
+export const getPostsSuccess = (posts) => ({
   type: GET_POSTS_SUCCESS,
   payload: posts,
 });
@@ -27,3 +27,31 @@ export const getPostsSuccess = () => ({
 export const getPostsFailure = () => ({
   type: GET_POSTS_FAILURE,
 });
+
+// Finally, make the asynchronous
+//thunk action that combines all three of the above actions.
+// When called, it will dispatch the initial getPosts()
+// action to inform Redux to prepare for an API call,
+//then in a try/catch,
+//do everything necessary to get the data,
+// and dispatch a success or failure action as necessary.
+
+export function fetchPosts() {
+  return async (dispatch) => {
+    dispatch(getPosts());
+    try {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts`
+      );
+      const data = await response.json();
+      dispatch(getPostsSuccess(data)); // if success pass in post, payload post will post if success,
+      //take data from json call and put it for the get post
+    } catch (error) {
+      dispatch(getPostsFailure());
+    }
+  };
+}
+
+//dispatch is method avalible in store, (wrapped in provider)
+// object that accepts an object which is used to update the redux state.
+// usally this object is envoking an action creator.
